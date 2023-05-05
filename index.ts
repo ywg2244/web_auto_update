@@ -2,17 +2,19 @@
  * @Author: ywg ywg2244@163.com
  * @Date: 2023-05-04 16:39:38
  * @LastEditors: ywg ywg2244@163.com
- * @LastEditTime: 2023-05-05 14:43:48
+ * @LastEditTime: 2023-05-05 17:39:24
  * @FilePath: /autoUpDate/src/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 
+import { isFun } from "./lib/type/is";
+
 /**
  * 长时间停留页面,自动检测当前站点更新情况
  */
-export default class AutoUpData {
+class AutoUpData {
   /** 一开始的script的src数组集合 */
-  _lastSrcs: (string | undefined)[] = [];
+  _lastSrcs: string[] = [];
   /** 一开始的当前html节点字符串长度 */
   _htmlLangth = 0;
   /** 匹配script的src正则 */
@@ -21,13 +23,16 @@ export default class AutoUpData {
   _baseUrl = "/";
   /** 轮训验证时间戳，默认2000毫秒 */
   _times = 2000;
-  /** 响应函数 */
-  _response?: () => void = undefined;
-  /**
-   *
-   * @param {{baseUrl?:String,times?:Number,response?:() => void}} options
-   */
-  constructor(options: { baseUrl: string; times: number; response: () => void; }) {
+  /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框) */
+  _response?: () => boolean = undefined;
+  constructor(options?: {
+    /** 当前请求地址 默认根地址 "/" */
+    baseUrl?: string;
+    /** 轮训验证时间戳，默认2000毫秒 */
+    times?: number;
+    /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框)  必须返回一个布尔值，true表示用户点击已同意更新，false则表示未同意 */
+    response?: () => boolean;
+  }) {
     options && options.baseUrl && (this._baseUrl = options.baseUrl);
     options && options.times && (this._times = options.times);
     options && options.response && (this._response = options.response);
@@ -39,13 +44,15 @@ export default class AutoUpData {
    */
   async extractNewScripts() {
     const html = await fetch(this._baseUrl + "?_timestamp=" + Date.now()).then(
-      (resp: { text: () => any; }) => resp.text()
+      (resp) => resp.text()
     );
     this._srciptReg.lastIndex = 0;
-    let result = [];
+    let result: string[] = [];
     let match: RegExpExecArray | null;
     while ((match = this._srciptReg.exec(html))) {
-      result.push(match.groups?.src);
+      if (match.groups) {
+        result.push(match.groups.src);
+      }
     }
     return { result, html };
   }
@@ -70,7 +77,7 @@ export default class AutoUpData {
       result = true;
       return result;
     }
-    // 循化便利script的src数组，分别对比位置及判断是否一致，不一致的说明有更新
+    // 轮询遍历 script的src数组，分别对比位置及判断是否一致，不一致的说明有更新
     for (let i = 0; i < this._lastSrcs.length; i++) {
       if (this._lastSrcs[i] !== newScripts[i]) {
         result = true;
@@ -87,8 +94,8 @@ export default class AutoUpData {
       // 网站内容已更新
       if (status) {
         console.log(`The current site has been updated:`, "当前网站已更新");
-        if (this._response) {
-          this._response();
+        if (isFun(this._response)) {
+          this._response() && location.reload();
         } else {
           if (confirm("确定更新吗?")) {
             // 操作跟新动作
@@ -103,3 +110,6 @@ export default class AutoUpData {
     }, this._times);
   }
 }
+
+
+export default AutoUpData;

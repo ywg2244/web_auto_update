@@ -3,7 +3,7 @@
  * @Author: ywg ywg2244@163.com
  * @Date: 2023-05-04 16:39:38
  * @LastEditors: ywg ywg2244@163.com
- * @LastEditTime: 2023-05-05 14:43:48
+ * @LastEditTime: 2023-05-05 17:39:24
  * @FilePath: /autoUpDate/src/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -44,14 +44,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var is_1 = require("./lib/type/is");
 /**
  * 长时间停留页面,自动检测当前站点更新情况
  */
 var AutoUpData = /** @class */ (function () {
-    /**
-     *
-     * @param {{baseUrl?:String,times?:Number,response?:() => void}} options
-     */
     function AutoUpData(options) {
         /** 一开始的script的src数组集合 */
         this._lastSrcs = [];
@@ -63,7 +60,7 @@ var AutoUpData = /** @class */ (function () {
         this._baseUrl = "/";
         /** 轮训验证时间戳，默认2000毫秒 */
         this._times = 2000;
-        /** 响应函数 */
+        /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框) */
         this._response = undefined;
         options && options.baseUrl && (this._baseUrl = options.baseUrl);
         options && options.times && (this._times = options.times);
@@ -74,18 +71,19 @@ var AutoUpData = /** @class */ (function () {
      * 提取脚本字符串
      */
     AutoUpData.prototype.extractNewScripts = function () {
-        var _a;
         return __awaiter(this, void 0, void 0, function () {
             var html, result, match;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0: return [4 /*yield*/, fetch(this._baseUrl + "?_timestamp=" + Date.now()).then(function (resp) { return resp.text(); })];
                     case 1:
-                        html = _b.sent();
+                        html = _a.sent();
                         this._srciptReg.lastIndex = 0;
                         result = [];
                         while ((match = this._srciptReg.exec(html))) {
-                            result.push((_a = match.groups) === null || _a === void 0 ? void 0 : _a.src);
+                            if (match.groups) {
+                                result.push(match.groups.src);
+                            }
                         }
                         return [2 /*return*/, { result: result, html: html }];
                 }
@@ -119,7 +117,7 @@ var AutoUpData = /** @class */ (function () {
                             result = true;
                             return [2 /*return*/, result];
                         }
-                        // 循化便利script的src数组，分别对比位置及判断是否一致，不一致的说明有更新
+                        // 轮询遍历 script的src数组，分别对比位置及判断是否一致，不一致的说明有更新
                         for (i = 0; i < this._lastSrcs.length; i++) {
                             if (this._lastSrcs[i] !== newScripts[i]) {
                                 result = true;
@@ -145,8 +143,8 @@ var AutoUpData = /** @class */ (function () {
                         // 网站内容已更新
                         if (status) {
                             console.log("The current site has been updated:", "当前网站已更新");
-                            if (this._response) {
-                                this._response();
+                            if ((0, is_1.isFun)(this._response)) {
+                                this._response() && location.reload();
                             }
                             else {
                                 if (confirm("确定更新吗?")) {
