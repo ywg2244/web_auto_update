@@ -21,7 +21,7 @@ export default class AutoUpData {
     constructor(options: {
         baseUrl: string;
         times: number;
-        response: null;
+        response: () => void;
     });
     /**
      * 提取脚本字符串
