@@ -1,0 +1,23 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 info pnpm": {
+    "err": {
+      "name": "Error",
+      "message": "not found: axios",
+      "code": "ENOENT",
+      "stack": "Error: not found: axios\n    at getNotFoundError (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:41440:51)\n    at Function.whichSync [as sync] (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:41517:13)\n    at getCommandAbsolutePathSync (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:43082:44)\n    at default_1 (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:43091:32)\n    at /Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:179676:39"
+    }
+  },
+  "2 error pnpm": {
+    "code": "ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL",
+    "prefix": "/Users/yaowengang/Desktop/autoUpData",
+    "err": {
+      "name": "pnpm",
+      "message": "not found: axios",
+      "code": "ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL",
+      "stack": "Error: not found: axios\n    at getNotFoundError (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:41440:51)\n    at Function.whichSync [as sync] (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:41517:13)\n    at getCommandAbsolutePathSync (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:43082:44)\n    at default_1 (/Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:43091:32)\n    at /Users/yaowengang/.nvm/versions/node/v14.17.5/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@6.24.1/node_modules/pnpm/dist/pnpm.cjs:179676:39"
+    }
+  }
+}
