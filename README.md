@@ -3,16 +3,16 @@
 ## 安装
 
 ```javascript
-npm i web_auto_update
+npm i @ywg2244/web_auto_update
 ```
 
 ## 使用
 
 ```javascript
-import WebAutoUpdate from "web_auto_update";
+import AutoUpData from "@ywg2244/web_auto_update";
 // ...
 
-new WebAutoUpdate({
+new AutoUpData({
   baseUrl: "/", // 默认
   times: 2000, // 默认
   response() {
