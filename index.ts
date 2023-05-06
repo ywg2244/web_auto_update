@@ -2,7 +2,7 @@
  * @Author: ywg ywg2244@163.com
  * @Date: 2023-05-04 16:39:38
  * @LastEditors: ywg ywg2244@163.com
- * @LastEditTime: 2023-05-06 14:34:07
+ * @LastEditTime: 2023-05-06 17:37:33
  * @FilePath: /autoUpDate/src/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -13,6 +13,8 @@ import { isFun } from "./lib/type/is";
  * 长时间停留页面,自动检测当前站点更新情况
  */
 class AutoUpData {
+  /** 自动检测程序是否开启    */
+  _status = true;
   _setTimeNum?: NodeJS.Timeout;
   /** 一开始的script的src数组集合 */
   _lastSrcs: string[] = [];
@@ -48,22 +50,35 @@ class AutoUpData {
     options && typeof options.isWatchHtmlLength === 'boolean' && (this._isWatchHtmlLength = options.isWatchHtmlLength);
     options && typeof options.debugger === 'boolean' && (this._debugger = options.debugger);
     this.startTest();
+    this.watchOffline();
+    this.watchOnline();
   }
   /**
    * 提取脚本字符串
    */
   async extractNewScripts() {
-    const html = await fetch(this._baseUrl + "?_timestamp=" + Date.now()).then(
-      (resp) => resp.text()
-    );
-    this._srciptReg.lastIndex = 0;
     let result: string[] = [];
-    let match: RegExpExecArray | null;
-    while ((match = this._srciptReg.exec(html))) {
-      if (match && match.groups) {
-        const src = match.groups.src;
-        result.findIndex(i => i === src) === -1 && result.push(src);
+    let html = '';
+    if (navigator.onLine) {
+      try {
+        html = await fetch(this._baseUrl + "?_timestamp=" + Date.now()).then(
+          (resp) => resp.text()
+        );
+      } catch (e) {
+        console.error(`请求异常:`, e);
+        this.stopTest();
       }
+      this._srciptReg.lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = this._srciptReg.exec(html))) {
+        if (match && match.groups) {
+          const src = match.groups.src;
+          result.findIndex(i => i === src) === -1 && result.push(src);
+        }
+      }
+    } else {
+      console.warn('设备处于离线状态，无法发送网络请求。');
+      this.stopTest();
     }
     return { result, html };
   }
@@ -120,6 +135,7 @@ class AutoUpData {
   }
   /** 开始执行自动检测更新程序 */
   startTest() {
+    if (!this._status) return;
     clearTimeout(this._setTimeNum);
     this._setTimeNum = setTimeout(async () => {
       const status = await this.needUpdate();
@@ -129,7 +145,7 @@ class AutoUpData {
         if (isFun(this._response)) {
           this._response() && location.reload();
         } else {
-          if (confirm("确定更新吗?")) {
+          if (confirm("已发现更新内容,确定现在更新吗?")) {
             clearTimeout(this._setTimeNum);
             // 操作跟新动作
             location.reload();
@@ -142,6 +158,24 @@ class AutoUpData {
         this.startTest();
       }
     }, this._times);
+  }
+  /** 监听网络是否关闭了（关闭网络直接 结束自动检测动作） */
+  watchOffline() {
+    window.addEventListener('offline', () => {
+      this.stopTest();
+    });
+  }
+  /** 监听网络是否开启了（开启网络直接 开始自动检测动作） */
+  watchOnline() {
+    window.addEventListener('online', () => {
+      this._status = true;
+      this.startTest();
+    });
+  }
+  /** 结束检测动作 */
+  stopTest() {
+    this._status = false;
+    clearTimeout(this._setTimeNum);
   }
 }
 

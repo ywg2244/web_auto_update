@@ -3,6 +3,8 @@
  * 长时间停留页面,自动检测当前站点更新情况
  */
 declare class AutoUpData {
+    /** 自动检测程序是否开启    */
+    _status: boolean;
     _setTimeNum?: NodeJS.Timeout;
     /** 一开始的script的src数组集合 */
     _lastSrcs: string[];
@@ -43,5 +45,11 @@ declare class AutoUpData {
     needUpdate(): Promise<boolean>;
     /** 开始执行自动检测更新程序 */
     startTest(): void;
+    /** 监听网络是否关闭了（关闭网络直接 结束自动检测动作） */
+    watchOffline(): void;
+    /** 监听网络是否开启了（开启网络直接 开始自动检测动作） */
+    watchOnline(): void;
+    /** 结束检测动作 */
+    stopTest(): void;
 }
 export default AutoUpData;

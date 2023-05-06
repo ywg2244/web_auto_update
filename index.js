@@ -3,7 +3,7 @@
  * @Author: ywg ywg2244@163.com
  * @Date: 2023-05-04 16:39:38
  * @LastEditors: ywg ywg2244@163.com
- * @LastEditTime: 2023-05-06 14:34:07
+ * @LastEditTime: 2023-05-06 17:34:54
  * @FilePath: /autoUpDate/src/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -50,6 +50,8 @@ var is_1 = require("./lib/type/is");
  */
 var AutoUpData = /** @class */ (function () {
     function AutoUpData(options) {
+        /** 自动检测程序是否开启    */
+        this._status = true;
         /** 一开始的script的src数组集合 */
         this._lastSrcs = [];
         /** 一开始的当前html节点字符串长度 */
@@ -72,20 +74,36 @@ var AutoUpData = /** @class */ (function () {
         options && typeof options.isWatchHtmlLength === 'boolean' && (this._isWatchHtmlLength = options.isWatchHtmlLength);
         options && typeof options.debugger === 'boolean' && (this._debugger = options.debugger);
         this.startTest();
+        this.watchOffline();
+        this.watchOnline();
     }
     /**
      * 提取脚本字符串
      */
     AutoUpData.prototype.extractNewScripts = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var html, result, match, _loop_1;
+            var result, html, e_1, match, _loop_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch(this._baseUrl + "?_timestamp=" + Date.now()).then(function (resp) { return resp.text(); })];
-                    case 1:
-                        html = _a.sent();
-                        this._srciptReg.lastIndex = 0;
+                    case 0:
                         result = [];
+                        html = '';
+                        if (!navigator.onLine) return [3 /*break*/, 5];
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, fetch(this._baseUrl + "?_timestamp=" + Date.now()).then(function (resp) { return resp.text(); })];
+                    case 2:
+                        html = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_1 = _a.sent();
+                        console.error("\u8BF7\u6C42\u5F02\u5E38:", e_1);
+                        this.stopTest();
+                        return [3 /*break*/, 4];
+                    case 4:
+                        this._srciptReg.lastIndex = 0;
+                        match = void 0;
                         _loop_1 = function () {
                             if (match && match.groups) {
                                 var src_1 = match.groups.src;
@@ -95,7 +113,12 @@ var AutoUpData = /** @class */ (function () {
                         while ((match = this._srciptReg.exec(html))) {
                             _loop_1();
                         }
-                        return [2 /*return*/, { result: result, html: html }];
+                        return [3 /*break*/, 6];
+                    case 5:
+                        console.warn('设备处于离线状态，无法发送网络请求。');
+                        this.stopTest();
+                        _a.label = 6;
+                    case 6: return [2 /*return*/, { result: result, html: html }];
                 }
             });
         });
@@ -162,6 +185,8 @@ var AutoUpData = /** @class */ (function () {
     /** 开始执行自动检测更新程序 */
     AutoUpData.prototype.startTest = function () {
         var _this = this;
+        if (!this._status)
+            return;
         clearTimeout(this._setTimeNum);
         this._setTimeNum = setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
             var status;
@@ -177,7 +202,7 @@ var AutoUpData = /** @class */ (function () {
                                 this._response() && location.reload();
                             }
                             else {
-                                if (confirm("确定更新吗?")) {
+                                if (confirm("已发现更新内容,确定现在更新吗?")) {
                                     clearTimeout(this._setTimeNum);
                                     // 操作跟新动作
                                     location.reload();
@@ -195,6 +220,28 @@ var AutoUpData = /** @class */ (function () {
                 }
             });
         }); }, this._times);
+    };
+    /** 监听网络是否关闭了（关闭网络直接 结束自动检测动作） */
+    AutoUpData.prototype.watchOffline = function () {
+        var _this = this;
+        window.addEventListener('offline', function () {
+            console.log("\u76D1\u542C\u7F51\u7EDC\u662F\u5426\u5173\u95ED\u4E86");
+            _this.stopTest();
+        });
+    };
+    /** 监听网络是否开启了（开启网络直接 开始自动检测动作） */
+    AutoUpData.prototype.watchOnline = function () {
+        var _this = this;
+        window.addEventListener('online', function () {
+            console.log("\u76D1\u542C\u7F51\u7EDC\u662F\u5426\u5F00\u542F\u4E86");
+            _this._status = true;
+            _this.startTest();
+        });
+    };
+    /** 结束检测动作 */
+    AutoUpData.prototype.stopTest = function () {
+        this._status = false;
+        clearTimeout(this._setTimeNum);
     };
     return AutoUpData;
 }());
