@@ -3,7 +3,7 @@
  * @Author: ywg ywg2244@163.com
  * @Date: 2023-05-04 16:39:38
  * @LastEditors: ywg ywg2244@163.com
- * @LastEditTime: 2023-05-05 17:39:24
+ * @LastEditTime: 2023-05-06 14:34:07
  * @FilePath: /autoUpDate/src/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -58,13 +58,19 @@ var AutoUpData = /** @class */ (function () {
         this._srciptReg = /\<script.*src=["'](?<src>[^"']+)/gm;
         /** 当前请求地址 默认根地址 */
         this._baseUrl = "/";
+        /** 是否监听html节点字符串长度作为更新的判断 */
+        this._isWatchHtmlLength = false;
+        /** 是否开启debugger模式，（console 输出更新对比的日志） */
+        this._debugger = false;
         /** 轮训验证时间戳，默认2000毫秒 */
         this._times = 2000;
         /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框) */
         this._response = undefined;
         options && options.baseUrl && (this._baseUrl = options.baseUrl);
         options && options.times && (this._times = options.times);
-        options && options.response && (this._response = options.response);
+        options && typeof options.response === 'function' && (this._response = options.response);
+        options && typeof options.isWatchHtmlLength === 'boolean' && (this._isWatchHtmlLength = options.isWatchHtmlLength);
+        options && typeof options.debugger === 'boolean' && (this._debugger = options.debugger);
         this.startTest();
     }
     /**
@@ -72,7 +78,7 @@ var AutoUpData = /** @class */ (function () {
      */
     AutoUpData.prototype.extractNewScripts = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var html, result, match;
+            var html, result, match, _loop_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, fetch(this._baseUrl + "?_timestamp=" + Date.now()).then(function (resp) { return resp.text(); })];
@@ -80,10 +86,14 @@ var AutoUpData = /** @class */ (function () {
                         html = _a.sent();
                         this._srciptReg.lastIndex = 0;
                         result = [];
-                        while ((match = this._srciptReg.exec(html))) {
-                            if (match.groups) {
-                                result.push(match.groups.src);
+                        _loop_1 = function () {
+                            if (match && match.groups) {
+                                var src_1 = match.groups.src;
+                                result.findIndex(function (i) { return i === src_1; }) === -1 && result.push(src_1);
                             }
+                        };
+                        while ((match = this._srciptReg.exec(html))) {
+                            _loop_1();
                         }
                         return [2 /*return*/, { result: result, html: html }];
                 }
@@ -100,40 +110,60 @@ var AutoUpData = /** @class */ (function () {
                     case 1:
                         _a = _b.sent(), newScripts = _a.result, html = _a.html;
                         result = false;
-                        // 判断第一次html的长度，则重新赋值长度
-                        if (this._htmlLangth === 0) {
-                            this._htmlLangth = html.length;
-                        }
                         // 判断第一次script的src，则重新赋值数组
                         if (!this._lastSrcs || this._lastSrcs.length === 0) {
                             this._lastSrcs = newScripts;
                         }
-                        // 判断当前html字符串长度不一致说明有更新
-                        if (this._htmlLangth !== html.length) {
-                            result = true;
-                        }
                         // 判断 script的src数组长度不一致，则表示更新过
                         if (this._lastSrcs.length !== newScripts.length) {
                             result = true;
+                            if (this._debugger) {
+                                console.log("\u5224\u65AD script\u7684src\u6570\u7EC4\u957F\u5EA6\u4E0D\u4E00\u81F4");
+                                console.log("\u4FDD\u5B58\u7684\u7684script\u7684src\u6570\u7EC4\u96C6\u5408 length: ".concat(this._lastSrcs.length, " "), this._lastSrcs);
+                                console.log("\u65B0\u7684\u7684script\u7684src\u6570\u7EC4\u96C6\u5408 length: ".concat(newScripts.length, " "), newScripts);
+                            }
                             return [2 /*return*/, result];
                         }
                         // 轮询遍历 script的src数组，分别对比位置及判断是否一致，不一致的说明有更新
                         for (i = 0; i < this._lastSrcs.length; i++) {
                             if (this._lastSrcs[i] !== newScripts[i]) {
                                 result = true;
+                                if (this._debugger) {
+                                    console.log("\u8F6E\u8BE2\u904D\u5386 script\u7684src\u6570\u7EC4\uFF0C\u5206\u522B\u5BF9\u6BD4\u4F4D\u7F6E\u53CA\u5224\u65AD\u662F\u5426\u4E00\u81F4");
+                                    console.log("\u4FDD\u5B58\u7684script src\u96C6\u5408:", this._lastSrcs);
+                                    console.log("\u65B0\u7684script src\u96C6\u5408:", newScripts);
+                                    console.log("index ".concat(i), this._lastSrcs[i], 'vs', newScripts[i]);
+                                }
                                 break;
                             }
                         }
-                        this._htmlLangth = html.length;
                         this._lastSrcs = newScripts;
+                        if (this._isWatchHtmlLength) {
+                            // 判断第一次html的长度，则重新赋值长度
+                            if (this._htmlLangth === 0) {
+                                this._htmlLangth = html.length;
+                            }
+                            // 判断当前html字符串长度不一致说明有更新
+                            if (this._htmlLangth !== html.length) {
+                                result = true;
+                                if (this._debugger) {
+                                    console.log("\u5224\u65AD\u5F53\u524Dhtml\u5B57\u7B26\u4E32\u957F\u5EA6\u4E0D\u4E00\u81F4\u8BF4\u660E\u6709\u66F4\u65B0");
+                                    console.log("\u4FDD\u5B58\u7684html\u8282\u70B9\u957F\u5EA6:", this._htmlLangth);
+                                    console.log("\u65B0\u7684html\u8282\u70B9\u957F\u5EA6:", html.length);
+                                }
+                            }
+                            this._htmlLangth = html.length;
+                        }
                         return [2 /*return*/, result];
                 }
             });
         });
     };
+    /** 开始执行自动检测更新程序 */
     AutoUpData.prototype.startTest = function () {
         var _this = this;
-        setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+        clearTimeout(this._setTimeNum);
+        this._setTimeNum = setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
             var status;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -148,10 +178,12 @@ var AutoUpData = /** @class */ (function () {
                             }
                             else {
                                 if (confirm("确定更新吗?")) {
+                                    clearTimeout(this._setTimeNum);
                                     // 操作跟新动作
                                     location.reload();
                                 }
                                 else {
+                                    clearTimeout(this._setTimeNum);
                                     // 已点击取消更新,则不继续轮询
                                 }
                             }
