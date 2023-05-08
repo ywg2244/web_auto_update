@@ -3,7 +3,7 @@
  * @Author: ywg ywg2244@163.com
  * @Date: 2023-05-04 16:39:38
  * @LastEditors: ywg ywg2244@163.com
- * @LastEditTime: 2023-05-06 17:34:54
+ * @LastEditTime: 2023-05-08 09:32:13
  * @FilePath: /autoUpDate/src/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -199,7 +199,7 @@ var AutoUpData = /** @class */ (function () {
                         if (status) {
                             console.log("The current site has been updated:", "当前网站已更新");
                             if ((0, is_1.isFun)(this._response)) {
-                                this._response() && location.reload();
+                                this._response();
                             }
                             else {
                                 if (confirm("已发现更新内容,确定现在更新吗?")) {
@@ -225,7 +225,6 @@ var AutoUpData = /** @class */ (function () {
     AutoUpData.prototype.watchOffline = function () {
         var _this = this;
         window.addEventListener('offline', function () {
-            console.log("\u76D1\u542C\u7F51\u7EDC\u662F\u5426\u5173\u95ED\u4E86");
             _this.stopTest();
         });
     };
@@ -233,7 +232,6 @@ var AutoUpData = /** @class */ (function () {
     AutoUpData.prototype.watchOnline = function () {
         var _this = this;
         window.addEventListener('online', function () {
-            console.log("\u76D1\u542C\u7F51\u7EDC\u662F\u5426\u5F00\u542F\u4E86");
             _this._status = true;
             _this.startTest();
         });

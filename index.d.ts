@@ -21,7 +21,7 @@ declare class AutoUpData {
     /** 轮训验证时间戳，默认2000毫秒 */
     _times: number;
     /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框) */
-    _response?: () => boolean;
+    _response?: () => void;
     constructor(options?: {
         /** 当前请求地址 默认根地址 "/" */
         baseUrl?: string;
@@ -31,8 +31,11 @@ declare class AutoUpData {
         isWatchHtmlLength?: boolean;
         /** 是否开启debugger模式，（console 输出更新对比的日志） */
         debugger?: boolean;
-        /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框)  必须返回一个布尔值，true表示用户点击已同意更新，false则表示未同意 */
-        response?: () => boolean;
+        /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框)  需用户手动出发更新机制
+         * * location.reload();
+         * * history.go(0);
+         */
+        response?: () => void;
     });
     /**
      * 提取脚本字符串
