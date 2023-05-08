@@ -9,7 +9,7 @@
 
 ```html
 <!--引入 cdn -->
-<script src="http://ywg.cool/file/AutoUpdate@1.2.2.js" ></script>
+<script src="http://ywg.cool/file/AutoUpdate.js" ></script>
 
 <!-- 使用 -->
 <script>

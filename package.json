@@ -1,10 +1,11 @@
 {
   "name": "@ywg2244/web_auto_update",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "引入js文件实现页面自动监听网站更新状态",
-  "main": "dist/webAutoUpdate.js",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc ./index.ts & tsc ./index.ts -d & webpack --config webpack.config.js"
+    "build": "tsc ./index.ts & tsc ./index.ts -d & npm run webpack",
+    "webpack":"webpack --config webpack.config.js & webpack --config webpack.config.fullName.js"
   },
   "types": "./index.d.ts",
   "repository": {
@@ -22,7 +23,7 @@
     "autoUpdate",
     "web_auto_update"
   ],
-  "author": "",
+  "author": "ywg | ywg2244@163.com",
   "license": "ISC",
   "devDependencies": {
     "babel-loader": "^9.1.2",
