@@ -9,12 +9,12 @@
   "types": "./index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/ywgcool/web_auto_update.git"
+    "url": "https://github.com/ywg2244/web_auto_update.git"
   },
   "bugs": {
-    "url": "https://gitee.com/ywgcool/web_auto_update/issues"
+    "url": "https://github.com/ywg2244/web_auto_update/issues"
   },
-  "homepage": "https://gitee.com/ywgcool/web_auto_update#readme",
+  "homepage": "https://github.com/ywg2244/web_auto_update#readme",
   "keywords": [
     "网站更新",
     "网站自动更新",
