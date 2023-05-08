@@ -1,17 +1,40 @@
 # 自动检测 web 页面更新脚本
 
-## adk(引入)
+## 实现思路
+实现机制是对比页面所有的script的标签，如果是工程化的（vue、react）会借助于webpack打包页面，一有更新script的src会变化hash值，与上次做对比，不一样就提醒更新.
+具体:工程网站一打开，把所有script的src都保存一下，默认2000毫米请求下根路径，再看看根路径的html文件的script的src根上次是否一致,其中,根据配置可以使用默认的`onfirm("已发现更新内容,确定现在更新吗?")`同步方式弹框阻塞页面进程让用户选择性更新,也可使用`options.response`钩子进行自定义UI弹框，需要注意的是,在这个钩子中,用户必须提供更新页面的方法.
+
+## sdk(引入)
 ### js script引入
 
 ```html
 <!--引入 cdn -->
-<script src="http://ywg.cool/file/AutoUpdate@1.2.1.js" ></script>
+<script src="http://ywg.cool/file/AutoUpdate@1.2.2.js" ></script>
 
 <!-- 使用 -->
 <script>
-  new AutoUpdate.default()
+  // 使用默认配置
+  // new AutoUpdate.default()
+  
+  
+  
+  // 或  使用自定义配置
+  new AutoUpdate.default({
+    times:10 * 1000,
+    response(){
+        //... 弹出更新框，可以自己使用UI框架
+
+
+        //需用户手动出发更新机制
+
+        //...  弹出自定义UI弹框，判断用户是否点击更新按钮  ，使用以下api进行更新
+        // 1* * location.reload();
+        // 2* * history.go(0);
+    }
+  })
 </script>
 ```
+**也可以将资源包下载到项目本地，进行相对路径引入**
 ## 安装(包引入)
 ### npm
 
@@ -32,17 +55,17 @@ yarn add @ywg2244/web_auto_update
 ## 使用
 
 ```javascript
-import AutoUpData from "@ywg2244/web_auto_update";
+import AutoUpdate from "@ywg2244/web_auto_update";
 // ...
 
-new AutoUpData({
+new AutoUpdate({
   baseUrl: "/", // 默认
   times: 2000, // 默认
   response() {
     //... 弹出更新框，可以自己使用UI框架
-    // 需要返回一个布尔值，表示用户是否同意更新
-
-    return true // true：内部会自动调用 location.reload() 方法进行刷新页面；false：会终止自动检测操作
+    //...  弹出自定义UI弹框，判断用户是否点击更新按钮 ，使用以下api进行更新
+    // 1* * location.reload();
+    // 2* * history.go(0);
 
   },
 });
@@ -55,7 +78,7 @@ new AutoUpData({
 |------|------|------|------|----------|:-------|
 |   baseUrl   | >1.1.0 | string   |   当前请求的地址   |     false|  '/'  |
 |   times   | >1.1.0|number   |   轮询请求首页的频率（毫秒）   |     false|  2000  |
-|   response   | >1.1.0 |function   |   响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框) 必须返回一个布尔值，true表示用户点击已同意更新，false则表示未同意  |     false|   |
+|   response   | >1.1.0 |function   |   响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框) 需要注意的是,在这个钩子中,用户必须提供更新页面的方法. [1* location.reload(); 2* history.go(0);] |     false|   |
 |   isWatchHtmlLength| >1.2.0   |boolean   |   是否监听html节点字符串长度作为更新的判断   |     false| false  |
 |   debugger  | >1.2.0 |boolean   |   是否开启debugger模式，（console 输出更新对比的日志）   |     false| false  |
 
