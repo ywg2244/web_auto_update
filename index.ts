@@ -2,7 +2,7 @@
  * @Author: ywg ywg2244@163.com
  * @Date: 2023-05-04 16:39:38
  * @LastEditors: ywg ywg2244@163.com
- * @LastEditTime: 2023-05-06 17:37:33
+ * @LastEditTime: 2023-05-08 09:32:13
  * @FilePath: /autoUpDate/src/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -31,7 +31,7 @@ class AutoUpData {
   /** 轮训验证时间戳，默认2000毫秒 */
   _times = 2000;
   /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框) */
-  _response?: () => boolean = undefined;
+  _response?: () => void = undefined;
   constructor(options?: {
     /** 当前请求地址 默认根地址 "/" */
     baseUrl?: string;
@@ -41,8 +41,11 @@ class AutoUpData {
     isWatchHtmlLength?: boolean;
     /** 是否开启debugger模式，（console 输出更新对比的日志） */
     debugger?: boolean;
-    /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框)  必须返回一个布尔值，true表示用户点击已同意更新，false则表示未同意 */
-    response?: () => boolean;
+    /** 响应函数 (检测到更新后的钩子，可以用来处理弹出UI弹框)  需用户手动出发更新机制
+     * * location.reload();
+     * * history.go(0);
+     */
+    response?: () => void;
   }) {
     options && options.baseUrl && (this._baseUrl = options.baseUrl);
     options && options.times && (this._times = options.times);
@@ -143,7 +146,7 @@ class AutoUpData {
       if (status) {
         console.log(`The current site has been updated:`, "当前网站已更新");
         if (isFun(this._response)) {
-          this._response() && location.reload();
+          this._response();
         } else {
           if (confirm("已发现更新内容,确定现在更新吗?")) {
             clearTimeout(this._setTimeNum);
