@@ -1,3 +1,11 @@
+/*
+ * @Author: ywg ywg2244@163.com
+ * @Date: 2023-05-08 13:18:50
+ * @LastEditors: ywg ywg2244@163.com
+ * @LastEditTime: 2023-05-10 09:30:47
+ * @FilePath: /WebAutoUpDate/webpack.config.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const packageInfo = require("./package.json");
 // 配置html-webpack插件
@@ -5,9 +13,9 @@ const path = require("path");
 
 module.exports = {
   mode: "production",
-  entry: "./index.ts",
+  entry: "./src/index.ts",
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "build"),
     filename: `AutoUpdate@${packageInfo.version}.js`,
     library: {
       name: "AutoUpdate",
