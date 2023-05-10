@@ -17,6 +17,10 @@
     <title>My Web app</title>
     <!--引入 资源 -->
     <script src="http://ywg.cool/file/AutoUpdate.js"></script>
+
+    <!-- 或  具体某个版本 -->
+    <!-- <script src="http://ywg.cool/file/AutoUpdate@<version>.js"></script> http://ywg.cool/file/AutoUpdate@1.2.4.js -->
+
   </head>
   <body>
     <!-- 使用 -->
