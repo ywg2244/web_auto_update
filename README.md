@@ -92,6 +92,6 @@ new AutoUpdate({
 | ----------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | :----- |
 | baseUrl           | >1.1.0 | string   | 当前请求的地址                                                                                                                                          | false    | '/'    |
 | times             | >1.1.0 | number   | 轮询请求首页的频率（毫秒）                                                                                                                              | false    | 2000   |
-| response          | >1.1.0 | function | 响应函数 (检测到更新后的钩子，可以用来处理弹出 UI 弹框) 需要注意的是,在这个钩子中,用户必须提供更新页面的方法. <br/><br/> 具体实现可参考:<br />1、 location.reload(); <br/>2、 history.go(0);] | false    |        |
+| response          | >1.1.0 | function | 响应函数 (检测到更新后的钩子，可以用来处理弹出 UI 弹框) 需要注意的是,在这个钩子中,用户必须提供更新页面的方法. <br/><br/> 具体实现可参考:<br />1、 location.reload(); <br/>2、 history.go(0); | false    |        |
 | isWatchHtmlLength | >1.2.0 | boolean  | 是否监听 html 节点字符串长度作为更新的判断                                                                                                              | false    | false  |
 | debugger          | >1.2.0 | boolean  | 是否开启 debugger 模式，（console 输出更新对比的日志）                                                                                                  | false    | false  |
